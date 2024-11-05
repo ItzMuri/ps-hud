@@ -1048,12 +1048,25 @@ CreateThread(function()
     while true do
         if LocalPlayer.state.isLoggedIn then
             local ped = PlayerPedId()
-            if IsPedInAnyVehicle(ped, false) and not IsThisModelABicycle(GetEntityModel(GetVehiclePedIsIn(ped, false))) and not isElectric(GetVehiclePedIsIn(ped, false)) then
-                if exports[Config.FuelScript]:GetFuel(GetVehiclePedIsIn(ped, false)) <= 20 then -- At 20% Fuel Left
-                    if Menu.isLowFuelChecked then
+            local vehicle = GetVehiclePedIsIn(ped, false)
+            
+            if IsPedInAnyVehicle(ped, false) and vehicle ~= 0 then
+                local model = GetEntityModel(vehicle)
+                
+                if not IsThisModelABicycle(model) and not isElectric(vehicle) then
+                    local fuelLevel
+                    if Config.FuelScript == "ox_fuel" then
+                        fuelLevel = Entity(vehicle).state.fuel
+                    elseif Config.FuelScript == "ps-fuel" then
+                        fuelLevel = exports['ps-fuel']:GetFuel(vehicle)
+                    elseif Config.FuelScript == "LegacyFuel" then
+                        fuelLevel = exports['LegacyFuel']:GetFuel(vehicle)
+                    end
+                    
+                    if fuelLevel and fuelLevel <= 20 and Menu.isLowFuelChecked then
                         TriggerServerEvent("InteractSound_SV:PlayOnSource", "pager", 0.10)
                         QBCore.Functions.Notify(Lang:t("notify.low_fuel"), "error")
-                        Wait(60000) -- repeats every 1 min until empty
+                        Wait(60000) -- Wait 1 minute before re-checking
                     end
                 end
             end
@@ -1061,6 +1074,7 @@ CreateThread(function()
         Wait(10000)
     end
 end)
+
 
 -- Money HUD
 
