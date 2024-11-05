@@ -874,10 +874,11 @@ local function getFuelLevel(vehicle)
         lastFuelUpdate = updateTick
         
         if Config.FuelScript == "ox_fuel" then
-            lastFuelCheck = math.floor(Entity(vehicle).state.fuel or 0)
-            lastFuelCheck = math.floor(exports['ps-fuel']:GetFuel(vehicle) or 0)
+            lastFuelCheck = math.floor(Entity(vehicle).state.fuel or 0) -- Default to 0 if fuel state is not set
+        elseif Config.FuelScript == "ps-fuel" then
+            lastFuelCheck = math.floor(exports['ps-fuel']:GetFuel(vehicle) or 0) -- Default to 0 if GetFuel returns nil
         elseif Config.FuelScript == "LegacyFuel" then
-            lastFuelCheck = math.floor(exports['LegacyFuel']:GetFuel(vehicle) or 0)
+            lastFuelCheck = math.floor(exports['LegacyFuel']:GetFuel(vehicle) or 0) -- Default to 0 if GetFuel returns nil
         end
     end
     
