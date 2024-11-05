@@ -865,16 +865,26 @@ local function updateVehicleHud(data)
 end
 
 local lastFuelUpdate = 0
-local lastFuelCheck = {}
+local lastFuelCheck = 0
 
 local function getFuelLevel(vehicle)
     local updateTick = GetGameTimer()
+    
     if (updateTick - lastFuelUpdate) > 2000 then
         lastFuelUpdate = updateTick
-        lastFuelCheck = math.floor(exports[Config.FuelScript]:GetFuel(vehicle))
+        
+        if Config.FuelScript == "ox_fuel" then
+            lastFuelCheck = math.floor(Entity(vehicle).state.fuel or 0)
+            lastFuelCheck = math.floor(exports['ps-fuel']:GetFuel(vehicle) or 0)
+        elseif Config.FuelScript == "LegacyFuel" then
+            lastFuelCheck = math.floor(exports['LegacyFuel']:GetFuel(vehicle) or 0)
+        end
     end
+    
     return lastFuelCheck
 end
+
+
 
 -- HUD Update loop
 
